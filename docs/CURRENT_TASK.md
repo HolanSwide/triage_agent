@@ -62,7 +62,8 @@ Output
 * `reason`：确定性的判定原因
 * `friendly_content`：根据结果生成的用户可读描述
 
-`friendly_content` 当前使用确定性 Python 逻辑生成，不使用 LLM。
+`friendly_content` 由 `make_output` Node 请求 LLM 生成。LLM 只能生成该字段，不能改变
+`triage_res`、`reason` 或其他 State 字段。
 
 ---
 
@@ -139,6 +140,14 @@ make_output ← triage
 
 校验完成后根据 `valid` 进行路由。
 
+路由实现方式：
+
+* `validate_input` 只负责校验输入并更新 State
+* 使用 LangGraph `add_conditional_edges` 条件边，根据 `valid` 进行路由
+* `valid == True` 路由到 `triage`
+* `valid == False` 路由到 `make_output`
+* 当前不使用 `Command`，避免将 State 更新与流程跳转耦合在同一个 Node 中
+
 ### triage
 
 只处理合法输入。
@@ -156,7 +165,12 @@ make_output ← triage
 
 职责：
 
-* 根据当前 Triage 结果生成 `friendly_content`
+* 根据当前 Triage 结果和 `reason` 请求 LLM 生成 `friendly_content`
+* 使用模型 `deepseek-v4-flash`，通过 API 调用
+* API 相关配置从 `env.sh` 中获取
+* `langchain_deepseek` 依赖在 `helloagent` 环境中已满足
+* LLM 调用失败时，使用字符串拼接生成 `friendly_content` 作为保底
+* 只能更新 `friendly_content`，不能改变 `triage_res`、`reason` 或其他字段
 * 不重新执行 Triage 判断
 
 ---
@@ -184,7 +198,7 @@ State 使用 `TypedDict`。
 本 Task：
 
 * 必须使用 LangGraph
-* 不使用 LLM
+* 仅允许 `make_output` 使用 LLM 生成 `friendly_content`
 * 不使用 Tool Calling
 * 不使用 Agentic Loop
 * 不使用 RAG

@@ -15,7 +15,7 @@ conda activate helloagent
 API Key 通过环境变量 `DEEPSEEK_API_KEY` 配置：
 
 ```bash
-export DEEPSEEK_API_KEY="<your-api-key>"
+source env.sh
 ```
 
 真实 API Key 仅用于本地运行，禁止提交到仓库。

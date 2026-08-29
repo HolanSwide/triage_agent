@@ -1,0 +1,549 @@
+{
+  "summary": {
+    "total": 20,
+    "expected_pass": 10,
+    "expected_fail": 5,
+    "expected_retest": 5
+  },
+  "binary_mapping": {
+    "positive": "PASS",
+    "negative": [
+      "FAIL",
+      "RETEST"
+    ]
+  },
+  "confusion_matrix": {
+    "tp": 10,
+    "fn": 0,
+    "tn": 10,
+    "fp": 0
+  },
+  "metrics": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "specificity": 1.0,
+    "f1": 1.0
+  },
+  "path_statistics": {
+    "validate_input->triage->make_output": 16,
+    "validate_input->make_output": 4
+  },
+  "cases": [
+    {
+      "name": "pass_case_04",
+      "input": {
+        "spec": {
+          "fault": "RU_ERROR",
+          "expected": "EMERGENCY_STOP"
+        },
+        "obs": {
+          "complete": true,
+          "fault": "RU_ERROR",
+          "actual": "EMERGENCY_STOP"
+        }
+      },
+      "expected_result": "PASS",
+      "actual_result": "PASS",
+      "expected_binary_label": "positive",
+      "actual_binary_label": "positive",
+      "classification": "TP",
+      "path": [
+        "validate_input",
+        "triage",
+        "make_output"
+      ],
+      "reason": "故障 RU_ERROR 注入正确，预期行为 EMERGENCY_STOP 与实际行为 EMERGENCY_STOP 一致",
+      "friendly_content": "测试结果：PASS。故障 RU_ERROR 注入正确，车辆实际行为 EMERGENCY_STOP 与预期行为 EMERGENCY_STOP 一致，测试通过。"
+    },
+    {
+      "name": "pass_case_03",
+      "input": {
+        "spec": {
+          "fault": "PLANNING_ERROR",
+          "expected": "EMERGENCY_STOP"
+        },
+        "obs": {
+          "complete": true,
+          "fault": "PLANNING_ERROR",
+          "actual": "EMERGENCY_STOP"
+        }
+      },
+      "expected_result": "PASS",
+      "actual_result": "PASS",
+      "expected_binary_label": "positive",
+      "actual_binary_label": "positive",
+      "classification": "TP",
+      "path": [
+        "validate_input",
+        "triage",
+        "make_output"
+      ],
+      "reason": "故障 PLANNING_ERROR 注入正确，预期行为 EMERGENCY_STOP 与实际行为 EMERGENCY_STOP 一致",
+      "friendly_content": "测试结果描述（测试替代响应）。"
+    },
+    {
+      "name": "retest_case_05",
+      "input": {
+        "spec": {
+          "fault": "RU_ERROR",
+          "expected": "EMERGENCY_STOP"
+        },
+        "obs": {
+          "complete": "True",
+          "fault": "RU_ERROR",
+          "actual": "EMERGENCY_STOP"
+        }
+      },
+      "expected_result": "RETEST",
+      "actual_result": "RETEST",
+      "expected_binary_label": "negative",
+      "actual_binary_label": "negative",
+      "classification": "TN",
+      "path": [
+        "validate_input",
+        "make_output"
+      ],
+      "reason": "字段类型错误: sample.obs.complete 应为 bool",
+      "friendly_content": "测试结果为“需重测”。判定原因：字段类型错误，`sample.obs.complete` 应为布尔型（bool），请修正后重新测试。"
+    },
+    {
+      "name": "fail_case_04",
+      "input": {
+        "spec": {
+          "fault": "PLANNING_ERROR",
+          "expected": "EMERGENCY_STOP"
+        },
+        "obs": {
+          "complete": true,
+          "fault": "PLANNING_ERROR",
+          "actual": "PULL_UP"
+        }
+      },
+      "expected_result": "FAIL",
+      "actual_result": "FAIL",
+      "expected_binary_label": "negative",
+      "actual_binary_label": "negative",
+      "classification": "TN",
+      "path": [
+        "validate_input",
+        "triage",
+        "make_output"
+      ],
+      "reason": "故障 PLANNING_ERROR 的预期行为是 EMERGENCY_STOP，与实际行为 PULL_UP 不一致",
+      "friendly_content": "测试结果为失败（FAIL）。原因是：故障 PLANNING_ERROR 的预期行为应为紧急停车（EMERGENCY_STOP），而实际行为是停车暂驻（PULL_UP），两者不一致。"
+    },
+    {
+      "name": "retest_case_03",
+      "input": {
+        "spec": {
+          "fault": "PLANNING_ERROR",
+          "expected": "PULL_OVER"
+        },
+        "obs": {
+          "complete": true,
+          "fault": "PLANNING_ERROR"
+        }
+      },
+      "expected_result": "RETEST",
+      "actual_result": "RETEST",
+      "expected_binary_label": "negative",
+      "actual_binary_label": "negative",
+      "classification": "TN",
+      "path": [
+        "validate_input",
+        "make_output"
+      ],
+      "reason": "字段类型错误: sample.obs.actual 应为 str",
+      "friendly_content": "测试结果描述（测试替代响应）。"
+    },
+    {
+      "name": "fail_case_02",
+      "input": {
+        "spec": {
+          "fault": "PLANNING_ERROR",
+          "expected": "PULL_UP"
+        },
+        "obs": {
+          "complete": true,
+          "fault": "PLANNING_ERROR",
+          "actual": "PULL_OVER"
+        }
+      },
+      "expected_result": "FAIL",
+      "actual_result": "FAIL",
+      "expected_binary_label": "negative",
+      "actual_binary_label": "negative",
+      "classification": "TN",
+      "path": [
+        "validate_input",
+        "triage",
+        "make_output"
+      ],
+      "reason": "故障 PLANNING_ERROR 的预期行为是 PULL_UP，与实际行为 PULL_OVER 不一致",
+      "friendly_content": "测试结果描述（测试替代响应）。"
+    },
+    {
+      "name": "fail_case_01",
+      "input": {
+        "spec": {
+          "fault": "PLANNING_ERROR",
+          "expected": "EMERGENCY_STOP"
+        },
+        "obs": {
+          "complete": true,
+          "fault": "PLANNING_ERROR",
+          "actual": "PULL_OVER"
+        }
+      },
+      "expected_result": "FAIL",
+      "actual_result": "FAIL",
+      "expected_binary_label": "negative",
+      "actual_binary_label": "negative",
+      "classification": "TN",
+      "path": [
+        "validate_input",
+        "triage",
+        "make_output"
+      ],
+      "reason": "故障 PLANNING_ERROR 的预期行为是 EMERGENCY_STOP，与实际行为 PULL_OVER 不一致",
+      "friendly_content": "测试结果描述（测试替代响应）。"
+    },
+    {
+      "name": "fail_case_05",
+      "input": {
+        "spec": {
+          "fault": "RU_ERROR",
+          "expected": "EMERGENCY_STOP"
+        },
+        "obs": {
+          "complete": true,
+          "fault": "RU_ERROR",
+          "actual": "PULL_UP"
+        }
+      },
+      "expected_result": "FAIL",
+      "actual_result": "FAIL",
+      "expected_binary_label": "negative",
+      "actual_binary_label": "negative",
+      "classification": "TN",
+      "path": [
+        "validate_input",
+        "triage",
+        "make_output"
+      ],
+      "reason": "故障 RU_ERROR 的预期行为是 EMERGENCY_STOP，与实际行为 PULL_UP 不一致",
+      "friendly_content": "测试结果描述（测试替代响应）。"
+    },
+    {
+      "name": "pass_case_01",
+      "input": {
+        "spec": {
+          "fault": "RU_ERROR",
+          "expected": "PULL_OVER"
+        },
+        "obs": {
+          "complete": true,
+          "fault": "RU_ERROR",
+          "actual": "PULL_OVER"
+        }
+      },
+      "expected_result": "PASS",
+      "actual_result": "PASS",
+      "expected_binary_label": "positive",
+      "actual_binary_label": "positive",
+      "classification": "TP",
+      "path": [
+        "validate_input",
+        "triage",
+        "make_output"
+      ],
+      "reason": "故障 RU_ERROR 注入正确，预期行为 PULL_OVER 与实际行为 PULL_OVER 一致",
+      "friendly_content": "测试结果描述（测试替代响应）。"
+    },
+    {
+      "name": "retest_case_02",
+      "input": {
+        "spec": {
+          "fault": "SENSOR_ERROR",
+          "expected": "PULL_UP"
+        },
+        "obs": {
+          "complete": true,
+          "fault": "RU_ERROR",
+          "actual": "PULL_UP"
+        }
+      },
+      "expected_result": "RETEST",
+      "actual_result": "RETEST",
+      "expected_binary_label": "negative",
+      "actual_binary_label": "negative",
+      "classification": "TN",
+      "path": [
+        "validate_input",
+        "triage",
+        "make_output"
+      ],
+      "reason": "故障注入不一致：设计故障为 SENSOR_ERROR，实际故障为 RU_ERROR",
+      "friendly_content": "测试结果描述（测试替代响应）。"
+    },
+    {
+      "name": "pass_case_02",
+      "input": {
+        "spec": {
+          "fault": "SENSOR_ERROR",
+          "expected": "PULL_OVER"
+        },
+        "obs": {
+          "complete": true,
+          "fault": "SENSOR_ERROR",
+          "actual": "PULL_OVER"
+        }
+      },
+      "expected_result": "PASS",
+      "actual_result": "PASS",
+      "expected_binary_label": "positive",
+      "actual_binary_label": "positive",
+      "classification": "TP",
+      "path": [
+        "validate_input",
+        "triage",
+        "make_output"
+      ],
+      "reason": "故障 SENSOR_ERROR 注入正确，预期行为 PULL_OVER 与实际行为 PULL_OVER 一致",
+      "friendly_content": "测试结果描述（测试替代响应）。"
+    },
+    {
+      "name": "pass_case_10",
+      "input": {
+        "spec": {
+          "fault": "PLANNING_ERROR",
+          "expected": "PULL_UP"
+        },
+        "obs": {
+          "complete": true,
+          "fault": "PLANNING_ERROR",
+          "actual": "PULL_UP"
+        }
+      },
+      "expected_result": "PASS",
+      "actual_result": "PASS",
+      "expected_binary_label": "positive",
+      "actual_binary_label": "positive",
+      "classification": "TP",
+      "path": [
+        "validate_input",
+        "triage",
+        "make_output"
+      ],
+      "reason": "故障 PLANNING_ERROR 注入正确，预期行为 PULL_UP 与实际行为 PULL_UP 一致",
+      "friendly_content": "测试结果描述（测试替代响应）。"
+    },
+    {
+      "name": "retest_case_04",
+      "input": {
+        "spec": {
+          "fault": "PLANNING_ERROR",
+          "expected": "PULL_OVER"
+        },
+        "obs": {
+          "complete": true,
+          "fault": "PLANNING_ERROR",
+          "actual": ""
+        }
+      },
+      "expected_result": "RETEST",
+      "actual_result": "RETEST",
+      "expected_binary_label": "negative",
+      "actual_binary_label": "negative",
+      "classification": "TN",
+      "path": [
+        "validate_input",
+        "make_output"
+      ],
+      "reason": "必要字段为空: sample.obs.actual",
+      "friendly_content": "测试结果描述（测试替代响应）。"
+    },
+    {
+      "name": "pass_case_07",
+      "input": {
+        "spec": {
+          "fault": "RU_ERROR",
+          "expected": "PULL_OVER"
+        },
+        "obs": {
+          "complete": true,
+          "fault": "RU_ERROR",
+          "actual": "PULL_OVER"
+        }
+      },
+      "expected_result": "PASS",
+      "actual_result": "PASS",
+      "expected_binary_label": "positive",
+      "actual_binary_label": "positive",
+      "classification": "TP",
+      "path": [
+        "validate_input",
+        "triage",
+        "make_output"
+      ],
+      "reason": "故障 RU_ERROR 注入正确，预期行为 PULL_OVER 与实际行为 PULL_OVER 一致",
+      "friendly_content": "测试结果描述（测试替代响应）。"
+    },
+    {
+      "name": "pass_case_08",
+      "input": {
+        "spec": {
+          "fault": "SENSOR_ERROR",
+          "expected": "EMERGENCY_STOP"
+        },
+        "obs": {
+          "complete": true,
+          "fault": "SENSOR_ERROR",
+          "actual": "EMERGENCY_STOP"
+        }
+      },
+      "expected_result": "PASS",
+      "actual_result": "PASS",
+      "expected_binary_label": "positive",
+      "actual_binary_label": "positive",
+      "classification": "TP",
+      "path": [
+        "validate_input",
+        "triage",
+        "make_output"
+      ],
+      "reason": "故障 SENSOR_ERROR 注入正确，预期行为 EMERGENCY_STOP 与实际行为 EMERGENCY_STOP 一致",
+      "friendly_content": "测试结果描述（测试替代响应）。"
+    },
+    {
+      "name": "pass_case_05",
+      "input": {
+        "spec": {
+          "fault": "PLANNING_ERROR",
+          "expected": "PULL_UP"
+        },
+        "obs": {
+          "complete": true,
+          "fault": "PLANNING_ERROR",
+          "actual": "PULL_UP"
+        }
+      },
+      "expected_result": "PASS",
+      "actual_result": "PASS",
+      "expected_binary_label": "positive",
+      "actual_binary_label": "positive",
+      "classification": "TP",
+      "path": [
+        "validate_input",
+        "triage",
+        "make_output"
+      ],
+      "reason": "故障 PLANNING_ERROR 注入正确，预期行为 PULL_UP 与实际行为 PULL_UP 一致",
+      "friendly_content": "测试结果描述（测试替代响应）。"
+    },
+    {
+      "name": "retest_case_01",
+      "input": {
+        "spec": {
+          "fault": "RU_ERROR",
+          "expected": "PULL_OVER"
+        },
+        "obs": {
+          "complete": false,
+          "fault": "RU_ERROR",
+          "actual": "PULL_OVER"
+        }
+      },
+      "expected_result": "RETEST",
+      "actual_result": "RETEST",
+      "expected_binary_label": "negative",
+      "actual_binary_label": "negative",
+      "classification": "TN",
+      "path": [
+        "validate_input",
+        "make_output"
+      ],
+      "reason": "测试数据不完整: sample.obs.complete 为 False",
+      "friendly_content": "测试结果描述（测试替代响应）。"
+    },
+    {
+      "name": "pass_case_09",
+      "input": {
+        "spec": {
+          "fault": "PLANNING_ERROR",
+          "expected": "EMERGENCY_STOP"
+        },
+        "obs": {
+          "complete": true,
+          "fault": "PLANNING_ERROR",
+          "actual": "EMERGENCY_STOP"
+        }
+      },
+      "expected_result": "PASS",
+      "actual_result": "PASS",
+      "expected_binary_label": "positive",
+      "actual_binary_label": "positive",
+      "classification": "TP",
+      "path": [
+        "validate_input",
+        "triage",
+        "make_output"
+      ],
+      "reason": "故障 PLANNING_ERROR 注入正确，预期行为 EMERGENCY_STOP 与实际行为 EMERGENCY_STOP 一致",
+      "friendly_content": "测试结果描述（测试替代响应）。"
+    },
+    {
+      "name": "pass_case_06",
+      "input": {
+        "spec": {
+          "fault": "PLANNING_ERROR",
+          "expected": "PULL_UP"
+        },
+        "obs": {
+          "complete": true,
+          "fault": "PLANNING_ERROR",
+          "actual": "PULL_UP"
+        }
+      },
+      "expected_result": "PASS",
+      "actual_result": "PASS",
+      "expected_binary_label": "positive",
+      "actual_binary_label": "positive",
+      "classification": "TP",
+      "path": [
+        "validate_input",
+        "triage",
+        "make_output"
+      ],
+      "reason": "故障 PLANNING_ERROR 注入正确，预期行为 PULL_UP 与实际行为 PULL_UP 一致",
+      "friendly_content": "测试结果描述（测试替代响应）。"
+    },
+    {
+      "name": "fail_case_03",
+      "input": {
+        "spec": {
+          "fault": "PLANNING_ERROR",
+          "expected": "PULL_OVER"
+        },
+        "obs": {
+          "complete": true,
+          "fault": "PLANNING_ERROR",
+          "actual": "PULL_UP"
+        }
+      },
+      "expected_result": "FAIL",
+      "actual_result": "FAIL",
+      "expected_binary_label": "negative",
+      "actual_binary_label": "negative",
+      "classification": "TN",
+      "path": [
+        "validate_input",
+        "triage",
+        "make_output"
+      ],
+      "reason": "故障 PLANNING_ERROR 的预期行为是 PULL_OVER，与实际行为 PULL_UP 不一致",
+      "friendly_content": "测试结果描述（测试替代响应）。"
+    }
+  ]
+}
