@@ -1,0 +1,816 @@
+{
+  "model": "deepseek-v4-flash",
+  "call_method": "ChatDeepSeek.invoke",
+  "full_chain_cases": [
+    {
+      "scenario": "positive_ru_error",
+      "expected": "PASS",
+      "actual": "PASS",
+      "passed": true,
+      "investigation_rounds": 2,
+      "tool_calls": [
+        {
+          "name": "lookup_knowledge",
+          "args": {
+            "fault": "RU_ERROR"
+          }
+        },
+        {
+          "name": "query_logs",
+          "args": {
+            "keyword": "RU_ERROR"
+          }
+        },
+        {
+          "name": "query_logs",
+          "args": {
+            "keyword": "PULL_OVER"
+          }
+        },
+        {
+          "name": "query_logs",
+          "args": {
+            "keyword": "/ru"
+          }
+        },
+        {
+          "name": "lookup_knowledge",
+          "args": {
+            "fault": "PULL_OVER"
+          }
+        }
+      ],
+      "evidence": [
+        {
+          "id": "3e0a8e8c5d5baf1e0e174df5127df45f9ebee213202660b9fd21f3c2d9a3cd63",
+          "type": "KNOWLEDGE",
+          "source": "knowledge_base",
+          "key": "RU_ERROR",
+          "value": "PULL_OVER",
+          "present": true,
+          "timestamp": null,
+          "raw_ref": null,
+          "tool_call_id": "call_00_RDBwSXvKfVignBCYB6Bb7448"
+        },
+        {
+          "id": "7b9c59d41bb92ac8215638efef7b078ce7eee37ac5eaec69beab4b3716392c97",
+          "type": "OBSERVATION",
+          "source": "log",
+          "key": "RU_ERROR",
+          "value": "RU_ERROR",
+          "present": true,
+          "timestamp": "09-01 23:02:10",
+          "raw_ref": "09-01 23:02:10 ERROR /ru: new fault: RU_ERROR, simulated fault.",
+          "tool_call_id": "call_01_3TWxGWvNr3H696jryJZ02140"
+        },
+        {
+          "id": "c191cb77f6c297bb8d69acca0e78c8e683e47e9d7cfa1dfb15288743dd62d6ff",
+          "type": "OBSERVATION",
+          "source": "log",
+          "key": "PULL_OVER",
+          "value": "PULL_OVER",
+          "present": true,
+          "timestamp": "09-01 23:02:11",
+          "raw_ref": "09-01 23:02:11 INFO /planner: publish action PULL_OVER.",
+          "tool_call_id": "call_00_SJnOG83WiqPVuH7eiWRf3774"
+        },
+        {
+          "id": "c9d9c7680aa5b17e4d542885a6f54f7d81cccbd0e9b94d4e27af41bb42d329fa",
+          "type": "OBSERVATION",
+          "source": "log",
+          "key": "/ru",
+          "value": "/ru",
+          "present": true,
+          "timestamp": "09-01 23:02:10",
+          "raw_ref": "09-01 23:02:10 ERROR /ru: new fault: RU_ERROR, simulated fault.",
+          "tool_call_id": "call_01_ixve4WXWjNc5V7fHhXxM8370"
+        },
+        {
+          "id": "9335d4526a1aa4774fb602f04c1a4dbd163ceae4d3b4ce94dc3711449e67e7a2",
+          "type": "KNOWLEDGE",
+          "source": "knowledge_base",
+          "key": "PULL_OVER",
+          "value": "",
+          "present": false,
+          "timestamp": null,
+          "raw_ref": null,
+          "tool_call_id": "call_02_cnLNMveH6iCM1MVEcOvM4987"
+        }
+      ],
+      "reason": "故障 RU_ERROR 已注入，且观察到预期指令 PULL_OVER",
+      "friendly_content": "测试通过：已成功注入故障RU_ERROR，并在日志中观测到预期指令PULL_OVER，行为符合预期。"
+    },
+    {
+      "scenario": "positive_sensor_error",
+      "expected": "PASS",
+      "actual": "PASS",
+      "passed": true,
+      "investigation_rounds": 2,
+      "tool_calls": [
+        {
+          "name": "query_logs",
+          "args": {
+            "keyword": "SENSOR_ERROR"
+          }
+        },
+        {
+          "name": "lookup_knowledge",
+          "args": {
+            "fault": "SENSOR_ERROR"
+          }
+        },
+        {
+          "name": "query_logs",
+          "args": {
+            "keyword": "SAFE_STOP"
+          }
+        },
+        {
+          "name": "query_logs",
+          "args": {
+            "keyword": "SENSOR_ERROR"
+          }
+        },
+        {
+          "name": "query_logs",
+          "args": {
+            "keyword": "fault"
+          }
+        }
+      ],
+      "evidence": [
+        {
+          "id": "21efb3786f60ea41706867e0043ce164cd8c5d1f9f1590c4ad6edb8dcba18cc0",
+          "type": "OBSERVATION",
+          "source": "log",
+          "key": "SENSOR_ERROR",
+          "value": "SENSOR_ERROR",
+          "present": true,
+          "timestamp": "09-01 23:02:10",
+          "raw_ref": "09-01 23:02:10 ERROR /ru: new fault: SENSOR_ERROR, simulated fault.",
+          "tool_call_id": "call_00_1W9jRF4Z6TGM4b1Nodye0824"
+        },
+        {
+          "id": "f83f5d1645fa465eeb1b8377c1f03f4d32716a59748d27c4e75631cd25eb5f06",
+          "type": "KNOWLEDGE",
+          "source": "knowledge_base",
+          "key": "SENSOR_ERROR",
+          "value": "SAFE_STOP",
+          "present": true,
+          "timestamp": null,
+          "raw_ref": null,
+          "tool_call_id": "call_01_Yq1cRTF7KPRg1pMEoRvR3717"
+        },
+        {
+          "id": "4edbe450bb1f694170a9927b9df7e9f101b02bb0d00e194b2435b7b8d15c0522",
+          "type": "OBSERVATION",
+          "source": "log",
+          "key": "SAFE_STOP",
+          "value": "SAFE_STOP",
+          "present": true,
+          "timestamp": "09-01 23:02:11",
+          "raw_ref": "09-01 23:02:11 INFO /planner: publish action SAFE_STOP.",
+          "tool_call_id": "call_00_U5wsCceSXwCc5XkBLSYb3650"
+        },
+        {
+          "id": "ec8a419074795b3b92b9f6de3f9a94b0c041fd68a3b36dadf9f8ad759832010b",
+          "type": "OBSERVATION",
+          "source": "log",
+          "key": "fault",
+          "value": "fault",
+          "present": true,
+          "timestamp": "09-01 23:02:10",
+          "raw_ref": "09-01 23:02:10 ERROR /ru: new fault: SENSOR_ERROR, simulated fault.",
+          "tool_call_id": "call_02_kCSNMwAIBISt9NCbF0sb8649"
+        }
+      ],
+      "reason": "故障 SENSOR_ERROR 已注入，且观察到预期指令 SAFE_STOP",
+      "friendly_content": "测试结果：通过。故障 SENSOR_ERROR 已注入，并观察到预期的 SAFE_STOP 指令，行为符合预期。"
+    },
+    {
+      "scenario": "positive_brake_error",
+      "expected": "PASS",
+      "actual": "PASS",
+      "passed": true,
+      "investigation_rounds": 1,
+      "tool_calls": [
+        {
+          "name": "lookup_knowledge",
+          "args": {
+            "fault": "BRAKE_ERROR"
+          }
+        },
+        {
+          "name": "query_logs",
+          "args": {
+            "keyword": "BRAKE_ERROR"
+          }
+        },
+        {
+          "name": "query_logs",
+          "args": {
+            "keyword": "EMERGENCY_BRAKE"
+          }
+        }
+      ],
+      "evidence": [
+        {
+          "id": "dfb1b1516c2485ef8ac6ee83a0df8a83541dae9fc81429bffbae95d3174a1db5",
+          "type": "KNOWLEDGE",
+          "source": "knowledge_base",
+          "key": "BRAKE_ERROR",
+          "value": "EMERGENCY_BRAKE",
+          "present": true,
+          "timestamp": null,
+          "raw_ref": null,
+          "tool_call_id": "call_00_C76zl5qyeXOAHSWkO9eA3330"
+        },
+        {
+          "id": "9bef23b9bcbe12c24a74ed899727c7f61795f718ad9e369068bc176a049ba1f4",
+          "type": "OBSERVATION",
+          "source": "log",
+          "key": "BRAKE_ERROR",
+          "value": "BRAKE_ERROR",
+          "present": true,
+          "timestamp": "09-01 23:02:10",
+          "raw_ref": "09-01 23:02:10 ERROR /ru: new fault: BRAKE_ERROR, simulated fault.",
+          "tool_call_id": "call_01_yNLLDi4zJKTfiUX5vKEe8629"
+        },
+        {
+          "id": "05f8bafe828c564da85e346fc8f8a103ad629cd0be055bbcc914061bebfaca40",
+          "type": "OBSERVATION",
+          "source": "log",
+          "key": "EMERGENCY_BRAKE",
+          "value": "EMERGENCY_BRAKE",
+          "present": true,
+          "timestamp": "09-01 23:02:11",
+          "raw_ref": "09-01 23:02:11 INFO /planner: publish action EMERGENCY_BRAKE.",
+          "tool_call_id": "call_02_jeiP0g0hPZWsg1mIUw1U6328"
+        }
+      ],
+      "reason": "故障 BRAKE_ERROR 已注入，且观察到预期指令 EMERGENCY_BRAKE",
+      "friendly_content": "测试通过。故障 BRAKE_ERROR 已注入，并观察到预期指令 EMERGENCY_BRAKE。"
+    },
+    {
+      "scenario": "positive_camera_error",
+      "expected": "PASS",
+      "actual": "PASS",
+      "passed": true,
+      "investigation_rounds": 1,
+      "tool_calls": [
+        {
+          "name": "lookup_knowledge",
+          "args": {
+            "fault": "CAMERA_ERROR"
+          }
+        },
+        {
+          "name": "query_logs",
+          "args": {
+            "keyword": "CAMERA_ERROR"
+          }
+        },
+        {
+          "name": "query_logs",
+          "args": {
+            "keyword": "EXIT_AUTONOMOUS_MODE"
+          }
+        }
+      ],
+      "evidence": [
+        {
+          "id": "e1bc42af6417db5eb45bb7635231e59e97e34595fa98cd9763107eb4c4b527e1",
+          "type": "KNOWLEDGE",
+          "source": "knowledge_base",
+          "key": "CAMERA_ERROR",
+          "value": "EXIT_AUTONOMOUS_MODE",
+          "present": true,
+          "timestamp": null,
+          "raw_ref": null,
+          "tool_call_id": "call_00_AJKDdkKNdUvtJ1Ralbi51690"
+        },
+        {
+          "id": "febfb28d28d914bee9ee739046c1e165ada8e23fa9b3d2b9542b08cf36cc080a",
+          "type": "OBSERVATION",
+          "source": "log",
+          "key": "CAMERA_ERROR",
+          "value": "CAMERA_ERROR",
+          "present": true,
+          "timestamp": "09-01 23:02:10",
+          "raw_ref": "09-01 23:02:10 ERROR /ru: new fault: CAMERA_ERROR, simulated fault.",
+          "tool_call_id": "call_01_MVOLMKo1bJ6QsOEp6VPl2730"
+        },
+        {
+          "id": "4bf101d3f6632147b3295e71f92dac0d4a6f39e2da5c9ae21489b3cd18482b42",
+          "type": "OBSERVATION",
+          "source": "log",
+          "key": "EXIT_AUTONOMOUS_MODE",
+          "value": "EXIT_AUTONOMOUS_MODE",
+          "present": true,
+          "timestamp": "09-01 23:02:11",
+          "raw_ref": "09-01 23:02:11 INFO /planner: publish action EXIT_AUTONOMOUS_MODE.",
+          "tool_call_id": "call_02_gDwR9kogNILARGYb0pJs7407"
+        }
+      ],
+      "reason": "故障 CAMERA_ERROR 已注入，且观察到预期指令 EXIT_AUTONOMOUS_MODE",
+      "friendly_content": "测试通过。已成功注入CAMERA_ERROR故障，并在日志中观察到预期指令EXIT_AUTONOMOUS_MODE，行为符合预期。"
+    },
+    {
+      "scenario": "positive_lidar_error",
+      "expected": "PASS",
+      "actual": "PASS",
+      "passed": true,
+      "investigation_rounds": 2,
+      "tool_calls": [
+        {
+          "name": "lookup_knowledge",
+          "args": {
+            "fault": "LIDAR_ERROR"
+          }
+        },
+        {
+          "name": "query_logs",
+          "args": {
+            "keyword": "LIDAR_ERROR"
+          }
+        },
+        {
+          "name": "query_logs",
+          "args": {
+            "keyword": "REDUCE_SPEED"
+          }
+        },
+        {
+          "name": "query_logs",
+          "args": {
+            "keyword": "LIDAR"
+          }
+        }
+      ],
+      "evidence": [
+        {
+          "id": "51b3c067a9350bb0a4df2ed0e4adfd128682ea3af7ac6128eedc4faaf4faf897",
+          "type": "KNOWLEDGE",
+          "source": "knowledge_base",
+          "key": "LIDAR_ERROR",
+          "value": "REDUCE_SPEED",
+          "present": true,
+          "timestamp": null,
+          "raw_ref": null,
+          "tool_call_id": "call_00_ClBVB45cAh0Ef7tW7rxE9876"
+        },
+        {
+          "id": "f09f7ce5c4fd69148ecff7dbb6eda668a4a3be00ef014ce8c47b51ef324377bb",
+          "type": "OBSERVATION",
+          "source": "log",
+          "key": "LIDAR_ERROR",
+          "value": "LIDAR_ERROR",
+          "present": true,
+          "timestamp": "09-01 23:02:10",
+          "raw_ref": "09-01 23:02:10 ERROR /ru: new fault: LIDAR_ERROR, simulated fault.",
+          "tool_call_id": "call_01_B0cV2o00VFyJAeAgHx6A5339"
+        },
+        {
+          "id": "29fb99cba40a87f34df500c1376d75e31df69ff3c40f7e0858c399afecee8e0f",
+          "type": "OBSERVATION",
+          "source": "log",
+          "key": "REDUCE_SPEED",
+          "value": "REDUCE_SPEED",
+          "present": true,
+          "timestamp": "09-01 23:02:11",
+          "raw_ref": "09-01 23:02:11 INFO /planner: publish action REDUCE_SPEED.",
+          "tool_call_id": "call_00_TYXKVo0Vo6KXv9fcZyKz3411"
+        },
+        {
+          "id": "6f34ddb546cde31c9c8a9aace9b4b7cf7987276c24b1c7cb015e41d0d8d87ed3",
+          "type": "OBSERVATION",
+          "source": "log",
+          "key": "LIDAR",
+          "value": "LIDAR",
+          "present": true,
+          "timestamp": "09-01 23:02:10",
+          "raw_ref": "09-01 23:02:10 ERROR /ru: new fault: LIDAR_ERROR, simulated fault.",
+          "tool_call_id": "call_01_lQkKC1MhvvSUZGZY8vUF8347"
+        }
+      ],
+      "reason": "故障 LIDAR_ERROR 已注入，且观察到预期指令 REDUCE_SPEED",
+      "friendly_content": "故障 LIDAR_ERROR 已注入，且观察到预期指令 REDUCE_SPEED。"
+    },
+    {
+      "scenario": "negative_no_fault_injection",
+      "expected": "RETEST",
+      "actual": "RETEST",
+      "passed": true,
+      "investigation_rounds": 1,
+      "tool_calls": [
+        {
+          "name": "lookup_knowledge",
+          "args": {
+            "fault": "RU_ERROR"
+          }
+        },
+        {
+          "name": "query_logs",
+          "args": {
+            "keyword": "RU_ERROR"
+          }
+        }
+      ],
+      "evidence": [
+        {
+          "id": "3e0a8e8c5d5baf1e0e174df5127df45f9ebee213202660b9fd21f3c2d9a3cd63",
+          "type": "KNOWLEDGE",
+          "source": "knowledge_base",
+          "key": "RU_ERROR",
+          "value": "PULL_OVER",
+          "present": true,
+          "timestamp": null,
+          "raw_ref": null,
+          "tool_call_id": "call_00_rKVxr9m0rb1JEktMQQSQ6645"
+        },
+        {
+          "id": "830a5d8d63f88da662c7b81a89e1265ed15fc32e2df73858bbb1bea24ed8ace0",
+          "type": "OBSERVATION",
+          "source": "log",
+          "key": "RU_ERROR",
+          "value": "RU_ERROR",
+          "present": false,
+          "timestamp": null,
+          "raw_ref": null,
+          "tool_call_id": "call_01_D5tiZBNxnTRQ1VZ8MpNh3808"
+        }
+      ],
+      "reason": "目标故障 RU_ERROR 未在完整日志窗口中观察到",
+      "friendly_content": "结论：RETEST。原因：目标故障 RU_ERROR 未在完整日志窗口中观察到。知识库中虽有对应记录（PULL_OVER），但日志中未出现该故障。"
+    },
+    {
+      "scenario": "negative_wrong_fault_injection",
+      "expected": "RETEST",
+      "actual": "RETEST",
+      "passed": true,
+      "investigation_rounds": 1,
+      "tool_calls": [
+        {
+          "name": "lookup_knowledge",
+          "args": {
+            "fault": "RU_ERROR"
+          }
+        },
+        {
+          "name": "query_logs",
+          "args": {
+            "keyword": "RU_ERROR"
+          }
+        }
+      ],
+      "evidence": [
+        {
+          "id": "3e0a8e8c5d5baf1e0e174df5127df45f9ebee213202660b9fd21f3c2d9a3cd63",
+          "type": "KNOWLEDGE",
+          "source": "knowledge_base",
+          "key": "RU_ERROR",
+          "value": "PULL_OVER",
+          "present": true,
+          "timestamp": null,
+          "raw_ref": null,
+          "tool_call_id": "call_00_sOao7qOtuZK7BdP6qOjH4259"
+        },
+        {
+          "id": "830a5d8d63f88da662c7b81a89e1265ed15fc32e2df73858bbb1bea24ed8ace0",
+          "type": "OBSERVATION",
+          "source": "log",
+          "key": "RU_ERROR",
+          "value": "RU_ERROR",
+          "present": false,
+          "timestamp": null,
+          "raw_ref": null,
+          "tool_call_id": "call_01_lZamGQU15uGfVZ76Hi2F7921"
+        }
+      ],
+      "reason": "目标故障 RU_ERROR 未在完整日志窗口中观察到",
+      "friendly_content": "复测结论：目标故障 RU_ERROR 未在完整日志窗口中观察到，建议进行复测。"
+    },
+    {
+      "scenario": "negative_wrong_action",
+      "expected": "FAIL",
+      "actual": "FAIL",
+      "passed": true,
+      "investigation_rounds": 2,
+      "tool_calls": [
+        {
+          "name": "lookup_knowledge",
+          "args": {
+            "fault": "RU_ERROR"
+          }
+        },
+        {
+          "name": "query_logs",
+          "args": {
+            "keyword": "RU_ERROR"
+          }
+        },
+        {
+          "name": "query_logs",
+          "args": {
+            "keyword": "PULL_OVER"
+          }
+        },
+        {
+          "name": "query_logs",
+          "args": {
+            "keyword": "23:02"
+          }
+        },
+        {
+          "name": "query_logs",
+          "args": {
+            "keyword": "/ru"
+          }
+        }
+      ],
+      "evidence": [
+        {
+          "id": "3e0a8e8c5d5baf1e0e174df5127df45f9ebee213202660b9fd21f3c2d9a3cd63",
+          "type": "KNOWLEDGE",
+          "source": "knowledge_base",
+          "key": "RU_ERROR",
+          "value": "PULL_OVER",
+          "present": true,
+          "timestamp": null,
+          "raw_ref": null,
+          "tool_call_id": "call_00_dvb0i1VI3qodJ7iwQFyp3669"
+        },
+        {
+          "id": "7b9c59d41bb92ac8215638efef7b078ce7eee37ac5eaec69beab4b3716392c97",
+          "type": "OBSERVATION",
+          "source": "log",
+          "key": "RU_ERROR",
+          "value": "RU_ERROR",
+          "present": true,
+          "timestamp": "09-01 23:02:10",
+          "raw_ref": "09-01 23:02:10 ERROR /ru: new fault: RU_ERROR, simulated fault.",
+          "tool_call_id": "call_01_1dPHRToPDRaYYDYSE92g5237"
+        },
+        {
+          "id": "3bc238cfacf846f5835764ed1dc46eef8be8d8ded1e05bc6205f5c2a5383a051",
+          "type": "OBSERVATION",
+          "source": "log",
+          "key": "PULL_OVER",
+          "value": "PULL_OVER",
+          "present": false,
+          "timestamp": null,
+          "raw_ref": null,
+          "tool_call_id": "call_00_H7vdagnZfjpDf3pyNzMh6687"
+        },
+        {
+          "id": "d65ad9e84f94ee11d1724673a34f94938ddcd53a65d6a9245fd30bb77147d4e1",
+          "type": "OBSERVATION",
+          "source": "log",
+          "key": "23:02",
+          "value": "23:02",
+          "present": true,
+          "timestamp": "09-01 23:02:10",
+          "raw_ref": "09-01 23:02:10 ERROR /ru: new fault: RU_ERROR, simulated fault.",
+          "tool_call_id": "call_01_dnKAvsSGGHyorkbFHODE8792"
+        },
+        {
+          "id": "6166f2c4a00d082924702c48714c7f14e79fb9f9f7e9edd3f941af15ab9b1623",
+          "type": "OBSERVATION",
+          "source": "log",
+          "key": "23:02",
+          "value": "23:02",
+          "present": true,
+          "timestamp": "09-01 23:02:11",
+          "raw_ref": "09-01 23:02:11 INFO /planner: publish action SAFE_STOP.",
+          "tool_call_id": "call_01_dnKAvsSGGHyorkbFHODE8792"
+        },
+        {
+          "id": "c9d9c7680aa5b17e4d542885a6f54f7d81cccbd0e9b94d4e27af41bb42d329fa",
+          "type": "OBSERVATION",
+          "source": "log",
+          "key": "/ru",
+          "value": "/ru",
+          "present": true,
+          "timestamp": "09-01 23:02:10",
+          "raw_ref": "09-01 23:02:10 ERROR /ru: new fault: RU_ERROR, simulated fault.",
+          "tool_call_id": "call_02_xm0VGDb4VWU3H7jRWdeK7354"
+        }
+      ],
+      "reason": "故障 RU_ERROR 已注入，但未观察到预期指令 PULL_OVER",
+      "friendly_content": "故障 RU_ERROR 已注入，但未观察到预期指令 PULL_OVER；实际日志显示发布了 SAFE_STOP。"
+    },
+    {
+      "scenario": "negative_empty_log",
+      "expected": "RETEST",
+      "actual": "RETEST",
+      "passed": true,
+      "investigation_rounds": 1,
+      "tool_calls": [
+        {
+          "name": "lookup_knowledge",
+          "args": {
+            "fault": "RU_ERROR"
+          }
+        },
+        {
+          "name": "query_logs",
+          "args": {
+            "keyword": "RU_ERROR"
+          }
+        },
+        {
+          "name": "query_logs",
+          "args": {
+            "keyword": "PULL_OVER"
+          }
+        }
+      ],
+      "evidence": [
+        {
+          "id": "3e0a8e8c5d5baf1e0e174df5127df45f9ebee213202660b9fd21f3c2d9a3cd63",
+          "type": "KNOWLEDGE",
+          "source": "knowledge_base",
+          "key": "RU_ERROR",
+          "value": "PULL_OVER",
+          "present": true,
+          "timestamp": null,
+          "raw_ref": null,
+          "tool_call_id": "call_00_4OQFXaTHOwsCm2rZR0Ai5799"
+        },
+        {
+          "id": "830a5d8d63f88da662c7b81a89e1265ed15fc32e2df73858bbb1bea24ed8ace0",
+          "type": "OBSERVATION",
+          "source": "log",
+          "key": "RU_ERROR",
+          "value": "RU_ERROR",
+          "present": false,
+          "timestamp": null,
+          "raw_ref": null,
+          "tool_call_id": "call_01_wasCYUUPvXL8S1Dzj3vZ3467"
+        },
+        {
+          "id": "3bc238cfacf846f5835764ed1dc46eef8be8d8ded1e05bc6205f5c2a5383a051",
+          "type": "OBSERVATION",
+          "source": "log",
+          "key": "PULL_OVER",
+          "value": "PULL_OVER",
+          "present": false,
+          "timestamp": null,
+          "raw_ref": null,
+          "tool_call_id": "call_02_HwJ37phsNqsQJLWOYnnq1765"
+        }
+      ],
+      "reason": "目标故障 RU_ERROR 未在完整日志窗口中观察到",
+      "friendly_content": "结论：需要重测（RETEST）。原因：目标故障 RU_ERROR 未在完整日志窗口中观察到。证据显示，虽然知识库中存在 RU_ERROR 对应 PULL_OVER 的记录，但日志中未出现 RU_ERROR 或 PULL_OVER 事件。"
+    },
+    {
+      "scenario": "negative_unrelated_log",
+      "expected": "RETEST",
+      "actual": "RETEST",
+      "passed": true,
+      "investigation_rounds": 1,
+      "tool_calls": [
+        {
+          "name": "lookup_knowledge",
+          "args": {
+            "fault": "RU_ERROR"
+          }
+        },
+        {
+          "name": "query_logs",
+          "args": {
+            "keyword": "RU_ERROR"
+          }
+        }
+      ],
+      "evidence": [
+        {
+          "id": "3e0a8e8c5d5baf1e0e174df5127df45f9ebee213202660b9fd21f3c2d9a3cd63",
+          "type": "KNOWLEDGE",
+          "source": "knowledge_base",
+          "key": "RU_ERROR",
+          "value": "PULL_OVER",
+          "present": true,
+          "timestamp": null,
+          "raw_ref": null,
+          "tool_call_id": "call_00_gVsObESnmAQLQxR2r1zi7260"
+        },
+        {
+          "id": "830a5d8d63f88da662c7b81a89e1265ed15fc32e2df73858bbb1bea24ed8ace0",
+          "type": "OBSERVATION",
+          "source": "log",
+          "key": "RU_ERROR",
+          "value": "RU_ERROR",
+          "present": false,
+          "timestamp": null,
+          "raw_ref": null,
+          "tool_call_id": "call_01_LuPVlxXIlMZSaf0vQzJl2793"
+        }
+      ],
+      "reason": "目标故障 RU_ERROR 未在完整日志窗口中观察到",
+      "friendly_content": "测试结果为RETEST，原因：目标故障RU_ERROR未在完整日志窗口中观察到。"
+    }
+  ],
+  "timeout_case": {
+    "scenario": "simulated_llm_timeout",
+    "expected": "PASS",
+    "actual": "PASS",
+    "passed": true,
+    "investigation_rounds": 1,
+    "tool_calls": [
+      {
+        "name": "lookup_knowledge",
+        "args": {
+          "fault": "RU_ERROR"
+        }
+      },
+      {
+        "name": "query_logs",
+        "args": {
+          "keyword": "RU_ERROR"
+        }
+      },
+      {
+        "name": "query_logs",
+        "args": {
+          "keyword": "PULL_OVER"
+        }
+      }
+    ],
+    "evidence": [
+      {
+        "id": "3e0a8e8c5d5baf1e0e174df5127df45f9ebee213202660b9fd21f3c2d9a3cd63",
+        "type": "KNOWLEDGE",
+        "source": "knowledge_base",
+        "key": "RU_ERROR",
+        "value": "PULL_OVER",
+        "present": true,
+        "timestamp": null,
+        "raw_ref": null,
+        "tool_call_id": "call_00_mr8l7OO8nRgjljAWbCEl9347"
+      },
+      {
+        "id": "7b9c59d41bb92ac8215638efef7b078ce7eee37ac5eaec69beab4b3716392c97",
+        "type": "OBSERVATION",
+        "source": "log",
+        "key": "RU_ERROR",
+        "value": "RU_ERROR",
+        "present": true,
+        "timestamp": "09-01 23:02:10",
+        "raw_ref": "09-01 23:02:10 ERROR /ru: new fault: RU_ERROR, simulated fault.",
+        "tool_call_id": "call_01_JH6OHhgYNluw30pVU4ML5029"
+      },
+      {
+        "id": "c191cb77f6c297bb8d69acca0e78c8e683e47e9d7cfa1dfb15288743dd62d6ff",
+        "type": "OBSERVATION",
+        "source": "log",
+        "key": "PULL_OVER",
+        "value": "PULL_OVER",
+        "present": true,
+        "timestamp": "09-01 23:02:11",
+        "raw_ref": "09-01 23:02:11 INFO /planner: publish action PULL_OVER.",
+        "tool_call_id": "call_02_L1IDDdZvRmlOKOn4VAkV7824"
+      }
+    ],
+    "reason": "故障 RU_ERROR 已注入，且观察到预期指令 PULL_OVER",
+    "friendly_content": "PASS：故障 RU_ERROR 已注入，且观察到预期指令 PULL_OVER",
+    "expected_fallback": true,
+    "fallback_used": true
+  },
+  "supplemental_tests": [
+    {
+      "scenario": "testspec_knowledge_conflict",
+      "passed": true
+    },
+    {
+      "scenario": "invalid_input_missing_log",
+      "passed": true
+    },
+    {
+      "scenario": "evidence_deduplication",
+      "passed": true
+    },
+    {
+      "scenario": "unknown_vs_absent",
+      "passed": true
+    },
+    {
+      "scenario": "tool_result_single_consumption",
+      "passed": true
+    },
+    {
+      "scenario": "investigator_early_stop",
+      "passed": true
+    },
+    {
+      "scenario": "graph_streaming_path",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "full_chain_passed": true,
+    "full_chain_count": 10,
+    "timeout_fallback_passed": true,
+    "supplemental_passed": true
+  }
+}

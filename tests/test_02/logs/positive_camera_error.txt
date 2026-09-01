@@ -1,0 +1,2 @@
+09-01 23:02:10 ERROR /ru: new fault: CAMERA_ERROR, simulated fault.
+09-01 23:02:11 INFO /planner: publish action EXIT_AUTONOMOUS_MODE.
