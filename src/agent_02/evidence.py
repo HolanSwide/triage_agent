@@ -2,9 +2,10 @@
 
 import hashlib
 import json
+import re
 from typing import Any, Iterable, List
 
-from .models import Evidence
+from .models import Evidence, TestSpec
 
 
 def evidence_id(evidence: Evidence) -> str:
@@ -28,15 +29,39 @@ def evidence_reducer(existing: List[Evidence], updates: Iterable[Evidence]) -> L
     return result
 
 
-def query_logs_to_evidence(result: Any, tool_call_id: str) -> List[Evidence]:
-    query = result["query"]
+def expectation_to_evidence(spec: TestSpec) -> List[Evidence]:
+    return [with_stable_id(Evidence(id="", type="EXPECTATION", source="test_spec",
+                                     key="expected_action", value=spec.expected_action,
+                                     present=True))]
+
+
+def query_logs_to_evidence(result: Any, tool_call_id: str, spec: TestSpec) -> List[Evidence]:
     matches = result["matches"]
     if not matches:
-        return [Evidence(id="", type="OBSERVATION", source="log", key=query, value=query,
-                         present=False, tool_call_id=tool_call_id)]
-    return [Evidence(id="", type="OBSERVATION", source="log", key=query, value=query,
-                     present=True, timestamp=match["timestamp"], raw_ref=match["raw"],
-                     tool_call_id=tool_call_id) for match in matches]
+        query = result["query"]
+        if query == spec.fault:
+            return [Evidence(id="", type="OBSERVATION", source="log", key="fault", value=spec.fault,
+                             present=False, tool_call_id=tool_call_id)]
+        if query == spec.expected_action:
+            return [Evidence(id="", type="OBSERVATION", source="log", key="actual_action", value=spec.expected_action,
+                             present=False, tool_call_id=tool_call_id)]
+        return []
+    evidence: List[Evidence] = []
+    for match in matches:
+        raw = match["raw"]
+        fault_match = re.search(r"new fault:\s*([A-Za-z0-9_]+)", raw)
+        action_match = re.search(r"publish action\s+([A-Za-z0-9_]+)", raw)
+        if fault_match:
+            evidence.append(Evidence(id="", type="OBSERVATION", source="log", key="fault",
+                                     value=fault_match.group(1), present=True,
+                                     timestamp=match["timestamp"], raw_ref=raw,
+                                     tool_call_id=tool_call_id))
+        if action_match:
+            evidence.append(Evidence(id="", type="OBSERVATION", source="log", key="actual_action",
+                                     value=action_match.group(1), present=True,
+                                     timestamp=match["timestamp"], raw_ref=raw,
+                                     tool_call_id=tool_call_id))
+    return evidence
 
 
 def knowledge_to_evidence(result: Any, tool_call_id: str) -> List[Evidence]:

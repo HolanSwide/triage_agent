@@ -4,7 +4,7 @@ This module deliberately contains no investigation or triage business logic.
 """
 
 from pathlib import Path
-from typing import Dict, List, Literal, Optional, Set, TypedDict
+from typing import Any, Dict, List, Literal, Optional, Set, TypedDict
 
 from langgraph.graph import MessagesState
 from pydantic import BaseModel, Field
@@ -39,6 +39,20 @@ class RuntimeContext(TypedDict):
     max_investigation_rounds: int
 
 
+def parse_test_spec(raw: Any) -> TestSpec:
+    if isinstance(raw, TestSpec):
+        data = raw.model_dump()
+    elif isinstance(raw, dict):
+        data = raw
+    else:
+        raise ValueError("TestSpec must be an object")
+    if not isinstance(data.get("fault"), str) or not data["fault"].strip():
+        raise ValueError("fault must be a non-empty string")
+    if not isinstance(data.get("expected_action"), str) or not data["expected_action"].strip():
+        raise ValueError("expected_action must be a non-empty string")
+    return TestSpec(fault=data["fault"].strip(), expected_action=data["expected_action"].strip())
+
+
 def evidence_state_reducer(existing: List[Evidence], updates: List[Evidence]) -> List[Evidence]:
     """Append Evidence while preserving the first item for each stable ID."""
     result = list(existing)
@@ -51,7 +65,8 @@ def evidence_state_reducer(existing: List[Evidence], updates: List[Evidence]) ->
 
 
 class AgentState(MessagesState):
-    test_spec: TestSpec
+    raw_input: Any
+    test_spec: Optional[TestSpec]
     evidence: Annotated[List[Evidence], evidence_state_reducer]
     processed_tool_call_ids: Set[str]
     investigation_rounds: int

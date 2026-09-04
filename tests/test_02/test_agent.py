@@ -11,8 +11,8 @@ from langchain_core.messages import ToolMessage
 from langchain_deepseek import ChatDeepSeek
 
 from src.agent_02.graph import build_graph, initialize_state
-from src.agent_02.evidence import evidence_reducer, knowledge_to_evidence, query_logs_to_evidence
-from src.agent_02.models import RuntimeContext, TestSpec
+from src.agent_02.evidence import evidence_reducer, expectation_to_evidence, knowledge_to_evidence, query_logs_to_evidence
+from src.agent_02.models import RuntimeContext, TestSpec, parse_test_spec
 from src.agent_02.triage import deterministic_triage, evidence_sufficiency
 from tests.test_02.test_data import KNOWLEDGE_BASE, GeneratedCase, generate_negative_cases, generate_positive_cases
 
@@ -20,6 +20,14 @@ from tests.test_02.test_data import KNOWLEDGE_BASE, GeneratedCase, generate_nega
 TEST_DIR = Path(__file__).parent
 LOG_DIR = TEST_DIR / "logs"
 REPORT_PATH = TEST_DIR / "test_report.json"
+
+
+def _raises_value_error(function: Any) -> bool:
+    try:
+        function()
+    except (TypeError, ValueError, KeyError):
+        return True
+    return False
 
 
 class TimeoutOutputModel:
@@ -35,18 +43,41 @@ class StopInvestigator:
         return AIMessage(content="无法继续调查", tool_calls=[])
 
 
+class EarlyThenInvestigate:
+    def __init__(self) -> None:
+        self.calls = 0
+
+    def bind_tools(self, tools: Any) -> Any:
+        return self
+
+    def invoke(self, messages: Any) -> AIMessage:
+        self.calls += 1
+        if self.calls == 1:
+            return AIMessage(content="暂时停止", tool_calls=[])
+        sequence = [
+            ("lookup_knowledge", {"fault": "RU_ERROR"}),
+            ("query_logs", {"keyword": "RU_ERROR"}),
+            ("query_logs", {"keyword": "PULL_OVER"}),
+        ]
+        index = self.calls - 2
+        if index < len(sequence):
+            name, args = sequence[index]
+            return AIMessage(content="", tool_calls=[{"name": name, "args": args, "id": f"early-{self.calls}", "type": "tool_call"}])
+        return AIMessage(content="完成", tool_calls=[])
+
+
 def _supplemental_checks() -> List[Dict[str, Any]]:
     spec = TestSpec(fault="RU_ERROR", expected_action="PULL_OVER")
     knowledge_conflict = knowledge_to_evidence(
         {"fault": "RU_ERROR", "expected_action": "SAFE_STOP"}, "k"
     )
-    conflict_evidence = knowledge_conflict + [
-        query_logs_to_evidence({"query": "RU_ERROR", "matches": [{"timestamp": "t", "raw": "RU_ERROR"}]}, "f")[0],
-        query_logs_to_evidence({"query": "PULL_OVER", "matches": [{"timestamp": "t", "raw": "PULL_OVER"}]}, "a")[0],
+    conflict_evidence = expectation_to_evidence(spec) + knowledge_conflict + [
+        query_logs_to_evidence({"query": "RU_ERROR", "matches": [{"timestamp": "t", "raw": "new fault: RU_ERROR"}]}, "f", spec)[0],
+        query_logs_to_evidence({"query": "PULL_OVER", "matches": [{"timestamp": "t", "raw": "publish action PULL_OVER"}]}, "a", spec)[0],
     ]
     conflict_result = deterministic_triage(conflict_evidence, spec)[0]
-    absent = query_logs_to_evidence({"query": "RU_ERROR", "matches": []}, "absent")
-    present = query_logs_to_evidence({"query": "RU_ERROR", "matches": [{"timestamp": "t", "raw": "RU_ERROR"}]}, "present")
+    absent = query_logs_to_evidence({"query": "RU_ERROR", "matches": []}, "absent", spec)
+    present = query_logs_to_evidence({"query": "RU_ERROR", "matches": [{"timestamp": "t", "raw": "new fault: RU_ERROR"}]}, "present", spec)
     duplicate = evidence_reducer([], present + present)
     same_tool = evidence_reducer([], knowledge_to_evidence({"fault": "RU_ERROR", "expected_action": "PULL_OVER"}, "same") * 2)
     unknown_is_insufficient = not evidence_sufficiency([], spec)
@@ -56,27 +87,37 @@ def _supplemental_checks() -> List[Dict[str, Any]]:
         "knowledge_base": KNOWLEDGE_BASE,
         "max_investigation_rounds": 2,
     }
-    invalid_result = build_graph(StopInvestigator(), invalid_runtime).invoke(
-        initialize_state(spec)
+    invalid_result = build_graph(StopInvestigator()).invoke(
+        initialize_state({"expected_action": "PULL_OVER"}), context=invalid_runtime
     )
-    early_stop_result = build_graph(
-        StopInvestigator(),
-        {"log_path": LOG_DIR / "positive_ru_error.txt", "knowledge_base": KNOWLEDGE_BASE, "max_investigation_rounds": 1},
-    ).invoke(initialize_state(spec))
+    invalid_specs = [
+        {}, {"fault": "RU_ERROR"}, {"fault": 1, "expected_action": "PULL_OVER"},
+        {"fault": "", "expected_action": "PULL_OVER"}, "not-an-object",
+    ]
+    invalid_specs_passed = all(
+        _raises_value_error(lambda raw=raw: parse_test_spec(raw)) for raw in invalid_specs
+    )
+    invalid_rounds = build_graph(StopInvestigator()).invoke(
+        initialize_state(spec), context={"log_path": LOG_DIR / "positive_ru_error.txt", "knowledge_base": KNOWLEDGE_BASE, "max_investigation_rounds": 0}
+    )
+    early_runtime = {"log_path": LOG_DIR / "positive_ru_error.txt", "knowledge_base": KNOWLEDGE_BASE, "max_investigation_rounds": 5}
+    early_stop_result = build_graph(EarlyThenInvestigate()).invoke(
+        initialize_state({"fault": "RU_ERROR", "expected_action": "PULL_OVER"}), context=early_runtime
+    )
     streaming_path = [
         next(iter(update.keys()))
-        for update in build_graph(
-            StopInvestigator(),
-            {"log_path": LOG_DIR / "positive_ru_error.txt", "knowledge_base": KNOWLEDGE_BASE, "max_investigation_rounds": 1},
-        ).stream(initialize_state(spec), stream_mode="updates")
+        for update in build_graph(StopInvestigator()).stream(
+            initialize_state(spec), context=early_runtime, stream_mode="updates"
+        )
     ]
     return [
         {"scenario": "testspec_knowledge_conflict", "passed": conflict_result == "RETEST"},
         {"scenario": "invalid_input_missing_log", "passed": invalid_result["triage_res"] == "RETEST"},
+        {"scenario": "invalid_testspec_boundary", "passed": invalid_specs_passed and invalid_rounds["triage_res"] == "RETEST"},
         {"scenario": "evidence_deduplication", "passed": len(duplicate) == 1},
         {"scenario": "unknown_vs_absent", "passed": unknown_is_insufficient and absent_is_distinct},
         {"scenario": "tool_result_single_consumption", "passed": len(same_tool) == 1},
-        {"scenario": "investigator_early_stop", "passed": early_stop_result["triage_res"] == "RETEST"},
+        {"scenario": "investigator_early_stop", "passed": early_stop_result["triage_res"] == "PASS" and early_stop_result["investigation_rounds"] > 1},
         {"scenario": "graph_streaming_path", "passed": streaming_path[-1] == "make_output"},
     ]
 
@@ -92,8 +133,9 @@ def _run_case(case: GeneratedCase, output_model: Any = None) -> Dict[str, Any]:
         "max_investigation_rounds": 5,
     }
     model = _real_model()
-    result = build_graph(model, runtime, output_model=output_model or model).invoke(
-        initialize_state(TestSpec(fault=case.fault, expected_action=case.expected_action))
+    result = build_graph(model, output_model=output_model or model).invoke(
+        initialize_state(TestSpec(fault=case.fault, expected_action=case.expected_action)),
+        context=runtime,
     )
     tool_calls: List[Dict[str, Any]] = []
     for message in result["messages"]:
